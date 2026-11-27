@@ -1,9 +1,9 @@
 module instruction_slicer
 (
     input logic [31:0] instruction,
-    output logic [4:0] read_add_0,
-    output logic [4:0] read_add_1,
-    output logic [4:0] write_add,
+    output logic [4:0] read_addr_0,
+    output logic [4:0] read_addr_1,
+    output logic [4:0] write_addr,
     output logic [31:0] imm,
     output logic [2:0] funct3 
 );
@@ -26,49 +26,49 @@ logic [6:0] slice;
 assign slice = instruction[6:0];
 always_comb
 begin
-    read_add_0 = 0;
-    read_add_1 = 0;
-    write_add = 0;
+    read_addr_0 = 0;
+    read_addr_1 = 0;
+    write_addr = 0;
     imm = 0;
     funct3 = 0;
 
    unique0 case (slice)
     
     B_type : begin
-        read_add_0 = instruction[19:15];
-        read_add_1 = instruction[24:20];
+        read_addr_0 = instruction[19:15];
+        read_addr_1 = instruction[24:20];
         imm = {{20{instruction[31]}}, instruction[7], instruction[30:25], instruction[11:8], 1'b0};
         funct3 = instruction[14:12];
     end
 
     I_type_ALU, I_type_JALR, I_type_LOAD : begin
-        write_add = instruction[11:7];
+        write_addr = instruction[11:7];
         funct3 = instruction[14:12];
-        read_add_0 = instruction[19:15];
+        read_addr_0 = instruction[19:15];
         imm = {{20{instruction[31]}} ,instruction[31:20]};
     end
 
     J_type : begin
-        write_add = instruction[11:7];
+        write_addr = instruction[11:7];
         imm = {{12{instruction[31]}} ,instruction[19:12] ,instruction[20] ,instruction[30:21] ,1'b0};
     end
 
     R_type : begin
-        write_add = instruction[11:7];
+        write_addr = instruction[11:7];
         funct3 = instruction[14:12];
-        read_add_0 = instruction[19:15];
-        read_add_1 = instruction[24:20];
+        read_addr_0 = instruction[19:15];
+        read_addr_1 = instruction[24:20];
     end
 
     S_type : begin
         funct3 = instruction[14:12];
-        read_add_0 = instruction[19:15];
-        read_add_1 = instruction[24:20];
+        read_addr_0 = instruction[19:15];
+        read_addr_1 = instruction[24:20];
         imm = {{20{instruction[31]}}, instruction[31:25], instruction[11:7]};
     end
 
     U_type_pc, U_type_upper : begin
-        write_add = instruction[11:7];
+        write_addr = instruction[11:7];
         imm = {instruction[31:12], 12'b0};
     end
 
